@@ -3,8 +3,8 @@ PLUGIN_NAME := rundeck-k8s-nodes
 VERSION := 1.0.0
 PLUGIN_ZIP := $(PLUGIN_NAME)-$(VERSION).zip
 
-# kubectl-rundeck-nodes source directory
-KUBECTL_PLUGIN_DIR := ../kubectl-rundeck-nodes
+# kubectl-rundeck-nodes source directory (repo root)
+KUBECTL_PLUGIN_DIR := ..
 
 # Target architecture (default: linux-amd64 for typical Rundeck servers)
 GOOS ?= linux
@@ -19,7 +19,7 @@ build-binary:
 	@echo "Building kubectl-rundeck-nodes for $(GOOS)/$(GOARCH)..."
 	cd $(KUBECTL_PLUGIN_DIR) && \
 		GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags "-X main.version=$(VERSION)" \
-		-o ../rundeck-k8s-nodes/contents/kubectl-rundeck-nodes \
+		-o ./rundeck-plugin/contents/kubectl-rundeck-nodes \
 		./cmd/kubectl-rundeck-nodes
 
 build: build-binary $(PLUGIN_ZIP)
