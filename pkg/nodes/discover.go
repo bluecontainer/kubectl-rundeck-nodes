@@ -39,8 +39,8 @@ func Discover(ctx context.Context, client dynamic.Interface, opts DiscoverOption
 	}
 
 	nodes := make(map[string]*RundeckNode)
-	helmReleases := make(map[string]*helmInfo)      // key: "release@namespace"
-	workloadPods := make([]workloadPodInfo, 0)      // Track workloads for pod expansion
+	helmReleases := make(map[string]*helmInfo)          // key: "release@namespace"
+	workloadPods := make([]workloadPodInfo, 0)          // Track workloads for pod expansion
 	helmWorkloads := make(map[string][]workloadPodInfo) // Track workloads per helm release
 
 	// Discover StatefulSets (if type is allowed)

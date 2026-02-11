@@ -246,8 +246,8 @@ func TestRundeckNodeMarshalJSON(t *testing.T) {
 		HealthyPods:     "3",
 		Healthy:         "true",
 		ExtraAttributes: map[string]string{
-			"label_version":       "v1.0",
-			"annotation_oncall":   "team-a",
+			"label_version":     "v1.0",
+			"annotation_oncall": "team-a",
 		},
 	}
 

@@ -13,7 +13,7 @@ GOTEST := $(GOCMD) test
 GOMOD := $(GOCMD) mod
 GOFMT := $(GOCMD) fmt
 
-.PHONY: all build test clean fmt tidy install cross-compile docker-build docker-buildx docker-buildx-local docker-buildx-setup
+.PHONY: all build test clean fmt lint tidy install cross-compile docker-build docker-buildx docker-buildx-local docker-buildx-setup
 
 all: build
 
@@ -29,6 +29,12 @@ test-coverage:
 
 fmt:
 	$(GOFMT) ./...
+
+lint:
+	@echo "Checking formatting..."
+	@unformatted=$$(gofmt -l .); if [ -n "$$unformatted" ]; then echo "Files not formatted:"; echo "$$unformatted"; exit 1; fi
+	@echo "Running go vet..."
+	$(GOCMD) vet ./...
 
 tidy:
 	$(GOMOD) tidy
