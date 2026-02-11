@@ -1,0 +1,154 @@
+name: rundeck-k8s-nodes
+version: 1.0.0
+rundeckPluginVersion: 2.0
+author: bluecontainer
+description: Kubernetes workload discovery for Rundeck node source
+url: https://github.com/bluecontainer/kubectl-rundeck-nodes
+license: Apache-2.0
+tags:
+  - kubernetes
+  - k8s
+  - workload
+  - nodes
+  - discovery
+providers:
+  - name: k8s-workload-nodes
+    service: ResourceModelSource
+    title: Kubernetes Workload Nodes
+    description: |-
+      Discovers Kubernetes workloads (Helm releases, StatefulSets, Deployments)
+      as Rundeck nodes with targeting attributes for kubectl plugins.
+    plugin-type: script
+    script-interpreter: /bin/bash
+    script-file: nodes.sh
+    resource-format: resourcejson
+    config:
+      - name: k8s_token
+        type: String
+        title: Kubernetes Token
+        description: ServiceAccount token for K8s API access (select from Key Storage)
+        required: true
+        scope: Instance
+        renderingOptions:
+          selectionAccessor: "STORAGE_PATH"
+          valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+      - name: k8s_url
+        type: String
+        title: Kubernetes API URL
+        description: "Kubernetes API server URL (e.g., https://kubernetes.default.svc)"
+        required: true
+        scope: Instance
+      - name: namespace
+        type: String
+        title: Namespace
+        description: Namespace to discover workloads in (empty = all namespaces)
+        required: false
+        scope: Instance
+      - name: label_selector
+        type: String
+        title: Label Selector
+        description: "Filter workloads by labels (e.g., app=myapp)"
+        required: false
+        scope: Instance
+      - name: execution_mode
+        type: Select
+        title: Execution Mode
+        description: How to run the kubectl plugin
+        required: true
+        scope: Instance
+        default: native
+        values:
+          - native
+          - docker
+          - kubernetes
+      - name: docker_image
+        type: String
+        title: Docker Image
+        description: Image containing kubectl-rundeck-nodes (docker/kubernetes mode)
+        required: false
+        scope: Instance
+        default: bluecontainer/kubectl-rundeck-nodes:latest
+      - name: docker_network
+        type: String
+        title: Docker Network
+        description: Docker network to use (docker mode only)
+        required: false
+        scope: Instance
+        default: host
+      - name: plugin_namespace
+        type: String
+        title: Plugin Namespace
+        description: Namespace to run plugin pod in (kubernetes mode only)
+        required: false
+        scope: Instance
+        default: default
+      - name: service_account
+        type: String
+        title: Service Account
+        description: ServiceAccount for plugin pod (kubernetes mode only)
+        required: false
+        scope: Instance
+        default: default
+      - name: image_pull_policy
+        type: Select
+        title: Image Pull Policy
+        description: Image pull policy for plugin pod (kubernetes mode only)
+        required: false
+        scope: Instance
+        default: IfNotPresent
+        values:
+          - Always
+          - IfNotPresent
+          - Never
+      - name: cluster_name
+        type: String
+        title: Cluster Name
+        description: Cluster identifier for multi-cluster discovery
+        required: false
+        scope: Instance
+      - name: cluster_token_suffix
+        type: String
+        title: Cluster Token Suffix
+        description: "Key Storage path suffix for this cluster's token (e.g., clusters/prod/token)"
+        required: false
+        scope: Instance
+      - name: default_token_suffix
+        type: String
+        title: Default Token Suffix
+        description: Default Key Storage path suffix when not using multi-cluster
+        required: false
+        scope: Instance
+        default: rundeck/k8s-token
+      # Phase 1: Core Filtering Options
+      - name: types
+        type: String
+        title: Workload Types
+        description: "Only include these workload types (comma-separated: helm-release, statefulset, deployment)"
+        required: false
+        scope: Instance
+      - name: exclude_types
+        type: String
+        title: Exclude Types
+        description: "Exclude these workload types (comma-separated)"
+        required: false
+        scope: Instance
+      - name: exclude_labels
+        type: String
+        title: Exclude Labels
+        description: "Exclude workloads matching these labels (comma-separated selectors, e.g., app=operator,tier=control-plane)"
+        required: false
+        scope: Instance
+      - name: exclude_operator
+        type: Boolean
+        title: Exclude Operator
+        description: Exclude operator controller-manager workloads
+        required: false
+        scope: Instance
+        default: "true"
+      - name: healthy_only
+        type: Boolean
+        title: Healthy Only
+        description: Only include workloads with all pods running
+        required: false
+        scope: Instance
+        default: "false"
