@@ -1,0 +1,40 @@
+services:
+  k3s:
+    image: rancher/k3s:latest
+    command: server --disable traefik --disable metrics-server --tls-san k3s
+    privileged: true
+    environment:
+      K3S_TOKEN: integration-test-token
+      K3S_KUBECONFIG_OUTPUT: /output/kubeconfig.yaml
+      K3S_KUBECONFIG_MODE: "666"
+    volumes:
+      - k3s-server:/var/lib/rancher/k3s
+      - k3s-output:/output
+    tmpfs:
+      - /run
+      - /var/run
+    ports:
+      - "6443:6443"
+    healthcheck:
+      test: ["CMD", "kubectl", "get", "nodes", "--no-headers"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  rundeck:
+    image: rundeck/rundeck:5.8.0
+    environment:
+      RUNDECK_GRAILS_URL: http://localhost:4440
+      RUNDECK_SERVER_ADDRESS: 0.0.0.0
+    ports:
+      - "4440:4440"
+    volumes:
+      - ./plugins:/home/rundeck/libext
+      - ./rundeck/integration-test.aclpolicy:/home/rundeck/etc/integration-test.aclpolicy:ro
+    depends_on:
+      k3s:
+        condition: service_healthy
+
+volumes:
+  k3s-server:
+  k3s-output:

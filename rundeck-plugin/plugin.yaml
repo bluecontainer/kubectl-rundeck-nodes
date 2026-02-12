@@ -1,6 +1,6 @@
 name: rundeck-k8s-nodes
 version: 1.0.0
-rundeckPluginVersion: 2.0
+rundeckPluginVersion: 1.2
 author: bluecontainer
 description: Kubernetes workload discovery for Rundeck node source
 url: https://github.com/bluecontainer/kubectl-rundeck-nodes

@@ -1,0 +1,19 @@
+description: Allow key storage access for integration testing (admin users)
+context:
+  application: rundeck
+for:
+  storage:
+    - allow: [create, read, update, delete]
+by:
+  group: .*
+---
+description: Allow key storage access for integration testing (project)
+context:
+  application: rundeck
+for:
+  storage:
+    - match:
+        path: 'keys/integration-test/.*'
+      allow: [read]
+by:
+  urn: 'project:k8s-integration-test'

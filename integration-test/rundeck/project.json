@@ -1,0 +1,12 @@
+{
+  "name": "k8s-integration-test",
+  "config": {
+    "resources.source.1.type": "k8s-workload-nodes",
+    "resources.source.1.config.k8s_token": "keys/integration-test/k8s-token",
+    "resources.source.1.config.k8s_url": "https://k3s:6443",
+    "resources.source.1.config.execution_mode": "native",
+    "resources.source.1.config.namespace": "",
+    "resources.source.1.config.exclude_operator": "false",
+    "resources.source.1.config.healthy_only": "false"
+  }
+}

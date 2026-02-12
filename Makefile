@@ -13,7 +13,7 @@ GOTEST := $(GOCMD) test
 GOMOD := $(GOCMD) mod
 GOFMT := $(GOCMD) fmt
 
-.PHONY: all build test clean fmt lint tidy install cross-compile docker-build docker-buildx docker-buildx-local docker-buildx-setup
+.PHONY: all build test clean fmt lint tidy install cross-compile docker-build docker-buildx docker-buildx-local docker-buildx-setup integration-test
 
 all: build
 
@@ -85,6 +85,10 @@ docker-buildx-local:
 # Create buildx builder if not exists
 docker-buildx-setup:
 	docker buildx create --name multiarch --use --bootstrap || docker buildx use multiarch
+
+# Run integration tests (requires docker)
+integration-test:
+	$(MAKE) -C integration-test test
 
 # Run locally
 run:

@@ -29,6 +29,7 @@ The project includes a bundled Rundeck ResourceModelSource plugin for seamless i
   - [Using Node Attributes in Jobs](#using-node-attributes-in-jobs)
 - [Library Usage](#library-usage)
 - [Building](#building)
+- [Integration Testing](#integration-testing)
 - [CI/CD](#cicd)
 - [Project Structure](#project-structure)
 - [License](#license)
@@ -393,6 +394,49 @@ make test               # Run all tests
 make test-coverage      # Generate coverage report → coverage.html
 ```
 
+## Integration Testing
+
+The `integration-test/` directory contains an end-to-end test that verifies the Rundeck plugin discovers Kubernetes workloads correctly. It spins up a real k3s cluster and Rundeck instance via Docker Compose, loads the plugin, and asserts the resource model output.
+
+### Prerequisites
+
+- Docker with [Compose V2](https://docs.docker.com/compose/) (`docker compose`)
+- Go toolchain (to build the plugin binary)
+- `jq` and `make`
+
+### What It Does
+
+1. Builds the Rundeck plugin ZIP for the Docker host architecture
+2. Starts a **k3s** cluster and **Rundeck** server via Docker Compose
+3. Deploys an **nginx Deployment with 3 replicas** and creates a read-only ServiceAccount for the plugin
+4. Stores the ServiceAccount token in Rundeck Key Storage
+5. Creates a Rundeck project (`k8s-integration-test`) configured with the `k8s-workload-nodes` resource model source
+6. Queries the Rundeck API and verifies the plugin discovered the nginx deployment with correct attributes (`targetType=deployment`, `podCount=3`, `healthyPods=3`, etc.)
+
+### Running
+
+```bash
+# From the repo root
+make integration-test
+
+# Or from the integration-test/ directory
+make test
+```
+
+To keep containers running after a failure for debugging:
+
+```bash
+SKIP_CLEANUP=1 integration-test/scripts/run-test.sh
+```
+
+Additional targets inside `integration-test/`:
+
+```bash
+make logs      # View container logs
+make status    # Show container status
+make clean     # Tear down containers and volumes
+```
+
 ## CI/CD
 
 ### CI (Pull Requests & Main)
@@ -436,6 +480,12 @@ GHCR authentication uses the built-in `GITHUB_TOKEN` automatically.
 │   ├── contents/nodes.sh        Bash wrapper for Rundeck
 │   ├── Makefile                 Plugin build
 │   └── README.md                Plugin documentation
+├── integration-test/            End-to-end integration test
+│   ├── docker-compose.yml       k3s + Rundeck services
+│   ├── k8s/                     Kubernetes manifests (nginx, RBAC)
+│   ├── rundeck/                 Rundeck project config and API tokens
+│   ├── scripts/run-test.sh      Test orchestration script
+│   └── Makefile                 Test convenience targets
 ├── Dockerfile                   Multi-arch container image
 ├── Makefile                     Build, test, cross-compile targets
 └── go.mod                       Go 1.25, client-go v0.32.0

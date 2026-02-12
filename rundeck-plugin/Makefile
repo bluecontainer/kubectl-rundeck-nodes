@@ -2,6 +2,8 @@
 PLUGIN_NAME := rundeck-k8s-nodes
 VERSION := 1.0.0
 PLUGIN_ZIP := $(PLUGIN_NAME)-$(VERSION).zip
+# Top-level dir inside ZIP must match the ZIP filename (without .zip)
+PLUGIN_DIR := $(PLUGIN_NAME)-$(VERSION)
 
 # kubectl-rundeck-nodes source directory (repo root)
 KUBECTL_PLUGIN_DIR := ..
@@ -27,11 +29,17 @@ build: build-binary $(PLUGIN_ZIP)
 $(PLUGIN_ZIP): plugin.yaml contents/nodes.sh contents/kubectl-rundeck-nodes
 	@echo "Building Rundeck plugin: $(PLUGIN_ZIP)"
 	chmod +x contents/nodes.sh contents/kubectl-rundeck-nodes
-	zip -r $(PLUGIN_ZIP) plugin.yaml contents/
+	rm -rf $(PLUGIN_DIR)
+	mkdir -p $(PLUGIN_DIR)/contents
+	cp plugin.yaml $(PLUGIN_DIR)/
+	cp contents/nodes.sh contents/kubectl-rundeck-nodes $(PLUGIN_DIR)/contents/
+	zip -r $(PLUGIN_ZIP) $(PLUGIN_DIR)/
+	rm -rf $(PLUGIN_DIR)
 
 clean:
 	rm -f $(PLUGIN_ZIP)
 	rm -f contents/kubectl-rundeck-nodes
+	rm -rf $(PLUGIN_DIR)
 
 # Build for different architectures
 build-linux-amd64:

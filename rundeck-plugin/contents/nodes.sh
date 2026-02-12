@@ -59,7 +59,9 @@ fi
 # Find the kubectl-rundeck-nodes binary
 # Priority: 1) bundled in plugin, 2) system PATH
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -x "$SCRIPT_DIR/kubectl-rundeck-nodes" ]; then
+if [ -f "$SCRIPT_DIR/kubectl-rundeck-nodes" ]; then
+  # Ensure execute permission (Java ZIP extraction may strip it)
+  [ -x "$SCRIPT_DIR/kubectl-rundeck-nodes" ] || chmod +x "$SCRIPT_DIR/kubectl-rundeck-nodes"
   KUBECTL_RUNDECK_NODES="$SCRIPT_DIR/kubectl-rundeck-nodes"
 elif command -v kubectl-rundeck-nodes &>/dev/null; then
   KUBECTL_RUNDECK_NODES="kubectl-rundeck-nodes"
