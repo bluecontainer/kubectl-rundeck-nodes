@@ -25,6 +25,28 @@ EXCLUDE_TYPES="${RD_CONFIG_EXCLUDE_TYPES:-}"
 EXCLUDE_LABELS="${RD_CONFIG_EXCLUDE_LABELS:-}"
 EXCLUDE_OPERATOR="${RD_CONFIG_EXCLUDE_OPERATOR:-true}"
 HEALTHY_ONLY="${RD_CONFIG_HEALTHY_ONLY:-false}"
+UNHEALTHY_ONLY="${RD_CONFIG_UNHEALTHY_ONLY:-false}"
+
+# Phase 2: Pattern Matching Options
+NAME_PATTERN="${RD_CONFIG_NAME_PATTERN:-}"
+EXCLUDE_PATTERN="${RD_CONFIG_EXCLUDE_PATTERN:-}"
+EXCLUDE_NAMESPACES="${RD_CONFIG_EXCLUDE_NAMESPACES:-}"
+NAMESPACE_PATTERN="${RD_CONFIG_NAMESPACE_PATTERN:-}"
+EXCLUDE_NAMESPACE_PATTERN="${RD_CONFIG_EXCLUDE_NAMESPACE_PATTERN:-}"
+
+# Phase 4: Output Customization Options
+ADD_TAGS="${RD_CONFIG_ADD_TAGS:-}"
+LABELS_AS_TAGS="${RD_CONFIG_LABELS_AS_TAGS:-}"
+LABEL_ATTRIBUTES="${RD_CONFIG_LABEL_ATTRIBUTES:-}"
+ANNOTATION_ATTRIBUTES="${RD_CONFIG_ANNOTATION_ATTRIBUTES:-}"
+
+# Phase 5: Pod Discovery Options
+INCLUDE_PODS="${RD_CONFIG_INCLUDE_PODS:-false}"
+PODS_ONLY="${RD_CONFIG_PODS_ONLY:-false}"
+POD_STATUS="${RD_CONFIG_POD_STATUS:-}"
+POD_NAME_PATTERN="${RD_CONFIG_POD_NAME_PATTERN:-}"
+POD_READY_ONLY="${RD_CONFIG_POD_READY_ONLY:-false}"
+MAX_PODS_PER_WORKLOAD="${RD_CONFIG_MAX_PODS_PER_WORKLOAD:-0}"
 
 if [ -z "$K8S_TOKEN" ]; then
   echo "Error: K8S_TOKEN not provided" >&2
@@ -55,6 +77,28 @@ fi
 [ -n "$EXCLUDE_LABELS" ] && FLAGS="$FLAGS --exclude-labels=$EXCLUDE_LABELS"
 [ "$EXCLUDE_OPERATOR" = "true" ] && FLAGS="$FLAGS --exclude-operator"
 [ "$HEALTHY_ONLY" = "true" ] && FLAGS="$FLAGS --healthy-only"
+[ "$UNHEALTHY_ONLY" = "true" ] && FLAGS="$FLAGS --unhealthy-only"
+
+# Phase 2: Pattern Matching flags
+[ -n "$NAME_PATTERN" ] && FLAGS="$FLAGS --name-pattern=$NAME_PATTERN"
+[ -n "$EXCLUDE_PATTERN" ] && FLAGS="$FLAGS --exclude-pattern=$EXCLUDE_PATTERN"
+[ -n "$EXCLUDE_NAMESPACES" ] && FLAGS="$FLAGS --exclude-namespaces=$EXCLUDE_NAMESPACES"
+[ -n "$NAMESPACE_PATTERN" ] && FLAGS="$FLAGS --namespace-pattern=$NAMESPACE_PATTERN"
+[ -n "$EXCLUDE_NAMESPACE_PATTERN" ] && FLAGS="$FLAGS --exclude-namespace-pattern=$EXCLUDE_NAMESPACE_PATTERN"
+
+# Phase 4: Output Customization flags
+[ -n "$ADD_TAGS" ] && FLAGS="$FLAGS --add-tags=$ADD_TAGS"
+[ -n "$LABELS_AS_TAGS" ] && FLAGS="$FLAGS --labels-as-tags=$LABELS_AS_TAGS"
+[ -n "$LABEL_ATTRIBUTES" ] && FLAGS="$FLAGS --label-attributes=$LABEL_ATTRIBUTES"
+[ -n "$ANNOTATION_ATTRIBUTES" ] && FLAGS="$FLAGS --annotation-attributes=$ANNOTATION_ATTRIBUTES"
+
+# Phase 5: Pod Discovery flags
+[ "$INCLUDE_PODS" = "true" ] && FLAGS="$FLAGS --include-pods"
+[ "$PODS_ONLY" = "true" ] && FLAGS="$FLAGS --pods-only"
+[ -n "$POD_STATUS" ] && FLAGS="$FLAGS --pod-status=$POD_STATUS"
+[ -n "$POD_NAME_PATTERN" ] && FLAGS="$FLAGS --pod-name-pattern=$POD_NAME_PATTERN"
+[ "$POD_READY_ONLY" = "true" ] && FLAGS="$FLAGS --pod-ready-only"
+[ "$MAX_PODS_PER_WORKLOAD" != "0" ] && FLAGS="$FLAGS --max-pods-per-workload=$MAX_PODS_PER_WORKLOAD"
 
 # Find the kubectl-rundeck-nodes binary
 # Priority: 1) bundled in plugin, 2) system PATH

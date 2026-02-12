@@ -152,3 +152,107 @@ providers:
         required: false
         scope: Instance
         default: "false"
+      - name: unhealthy_only
+        type: Boolean
+        title: Unhealthy Only
+        description: Only include workloads with some pods not running
+        required: false
+        scope: Instance
+        default: "false"
+      # Phase 2: Pattern Matching Options
+      - name: name_pattern
+        type: String
+        title: Name Pattern
+        description: "Only include workloads matching these glob patterns (comma-separated, e.g., myapp-*)"
+        required: false
+        scope: Instance
+      - name: exclude_pattern
+        type: String
+        title: Exclude Pattern
+        description: "Exclude workloads matching these glob patterns (comma-separated)"
+        required: false
+        scope: Instance
+      - name: exclude_namespaces
+        type: String
+        title: Exclude Namespaces
+        description: "Exclude workloads in these namespaces (comma-separated)"
+        required: false
+        scope: Instance
+      - name: namespace_pattern
+        type: String
+        title: Namespace Pattern
+        description: "Only include workloads in namespaces matching these patterns (comma-separated)"
+        required: false
+        scope: Instance
+      - name: exclude_namespace_pattern
+        type: String
+        title: Exclude Namespace Pattern
+        description: "Exclude workloads in namespaces matching these patterns (comma-separated)"
+        required: false
+        scope: Instance
+      # Phase 4: Output Customization Options
+      - name: add_tags
+        type: String
+        title: Add Tags
+        description: "Add custom tags to all nodes (comma-separated, e.g., env:prod,team:platform)"
+        required: false
+        scope: Instance
+      - name: labels_as_tags
+        type: String
+        title: Labels as Tags
+        description: "Convert these Kubernetes labels to Rundeck tags (comma-separated, e.g., app.kubernetes.io/name)"
+        required: false
+        scope: Instance
+      - name: label_attributes
+        type: String
+        title: Label Attributes
+        description: "Add these Kubernetes labels as node attributes (comma-separated, e.g., app.kubernetes.io/version)"
+        required: false
+        scope: Instance
+      - name: annotation_attributes
+        type: String
+        title: Annotation Attributes
+        description: "Add these Kubernetes annotations as node attributes (comma-separated)"
+        required: false
+        scope: Instance
+      # Phase 5: Pod Discovery Options
+      - name: include_pods
+        type: Boolean
+        title: Include Pods
+        description: Include individual pods as nodes (in addition to workloads)
+        required: false
+        scope: Instance
+        default: "false"
+      - name: pods_only
+        type: Boolean
+        title: Pods Only
+        description: Only return pod nodes, excluding workload-level nodes (implies Include Pods)
+        required: false
+        scope: Instance
+        default: "false"
+      - name: pod_status
+        type: String
+        title: Pod Status
+        description: "Only include pods with these phases (comma-separated, e.g., Running,Pending)"
+        required: false
+        scope: Instance
+      - name: pod_name_pattern
+        type: String
+        title: Pod Name Pattern
+        description: "Only include pods matching these glob patterns (comma-separated, e.g., *-0 for first StatefulSet replica)"
+        required: false
+        scope: Instance
+      - name: pod_ready_only
+        type: Boolean
+        title: Pod Ready Only
+        description: Only include pods where all containers are ready
+        required: false
+        scope: Instance
+        default: "false"
+      - name: max_pods_per_workload
+        type: Integer
+        title: Max Pods Per Workload
+        description: Maximum number of pod nodes per workload (0 = unlimited)
+        required: false
+        scope: Instance
+        default: "0"
