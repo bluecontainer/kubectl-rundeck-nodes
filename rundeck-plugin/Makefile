@@ -1,6 +1,6 @@
 # Makefile for rundeck-k8s-nodes Rundeck plugin
 PLUGIN_NAME := rundeck-k8s-nodes
-VERSION := 1.0.0
+VERSION := $(shell git describe --tags --always --dirty 2>/dev/null | sed 's/^v//' || echo "0.0.0-dev")
 PLUGIN_ZIP := $(PLUGIN_NAME)-$(VERSION).zip
 # Top-level dir inside ZIP must match the ZIP filename (without .zip)
 PLUGIN_DIR := $(PLUGIN_NAME)-$(VERSION)
@@ -32,6 +32,7 @@ $(PLUGIN_ZIP): plugin.yaml contents/nodes.sh contents/kubectl-rundeck-nodes
 	rm -rf $(PLUGIN_DIR)
 	mkdir -p $(PLUGIN_DIR)/contents
 	cp plugin.yaml $(PLUGIN_DIR)/
+	sed -i 's/^version: .*/version: $(VERSION)/' $(PLUGIN_DIR)/plugin.yaml
 	cp contents/nodes.sh contents/kubectl-rundeck-nodes $(PLUGIN_DIR)/contents/
 	zip -r $(PLUGIN_ZIP) $(PLUGIN_DIR)/
 	rm -rf $(PLUGIN_DIR)

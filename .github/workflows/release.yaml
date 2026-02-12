@@ -35,9 +35,13 @@ jobs:
 
       - name: Build Rundeck plugin (amd64)
         run: make -C rundeck-plugin build-linux-amd64
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
 
       - name: Build Rundeck plugin (arm64)
         run: make -C rundeck-plugin build-linux-arm64
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
