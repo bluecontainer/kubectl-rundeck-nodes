@@ -30,6 +30,7 @@ The project includes a bundled Rundeck ResourceModelSource plugin for seamless i
 - [Library Usage](#library-usage)
 - [Building](#building)
 - [Integration Testing](#integration-testing)
+- [Releasing](#releasing)
 - [CI/CD](#cicd)
 - [Project Structure](#project-structure)
 - [License](#license)
@@ -69,10 +70,32 @@ go install github.com/bluecontainer/kubectl-rundeck-nodes/cmd/kubectl-rundeck-no
 ### Docker
 
 ```bash
-docker pull bluecontainer/kubectl-rundeck-nodes:latest
+docker pull ghcr.io/bluecontainer/kubectl-rundeck-nodes:latest
 ```
 
 The image is built on Alpine 3.19, runs as a non-root user (UID 1001), and supports `linux/amd64` and `linux/arm64`.
+
+### Rundeck Plugin
+
+Download the plugin ZIP from [GitHub Releases](https://github.com/bluecontainer/kubectl-rundeck-nodes/releases) and copy it to Rundeck's `libext` directory:
+
+```bash
+# Download the plugin for your Rundeck server architecture
+curl -LO https://github.com/bluecontainer/kubectl-rundeck-nodes/releases/latest/download/rundeck-k8s-nodes-1.0.0-linux-amd64.zip
+
+# Install into Rundeck
+cp rundeck-k8s-nodes-1.0.0-linux-amd64.zip /var/lib/rundeck/libext/
+```
+
+Or build and install from source:
+
+```bash
+cd rundeck-plugin
+make build
+make install RUNDECK_HOME=/var/lib/rundeck
+```
+
+See the [plugin README](rundeck-plugin/README.md) for configuration details.
 
 ## Usage
 
@@ -437,6 +460,26 @@ make status    # Show container status
 make clean     # Tear down containers and volumes
 ```
 
+## Releasing
+
+Releases are triggered by pushing a `v*` tag to GitHub, which runs the [release workflow](.github/workflows/release.yaml). The Makefile provides convenience targets:
+
+```bash
+# Release a specific version
+make release RELEASE_VERSION=1.2.0
+
+# Auto-increment the patch version (v1.2.0 → v1.2.1)
+make release-patch
+```
+
+Both targets create an annotated git tag and push it to origin, triggering the GitHub Actions release pipeline which:
+
+1. Runs tests
+2. Cross-compiles CLI binaries for 5 platforms
+3. Builds Rundeck plugin ZIPs (linux-amd64 and linux-arm64)
+4. Creates a GitHub Release with all artifacts attached
+5. Builds and pushes multi-arch Docker images to Docker Hub and GHCR
+
 ## CI/CD
 
 ### CI (Pull Requests & Main)
@@ -455,11 +498,7 @@ Every push to `main` and every pull request runs four parallel checks:
 Pushing a tag matching `v*` (e.g., `git tag v1.0.0 && git push origin v1.0.0`) triggers the release pipeline:
 
 1. **Build & Release** — runs tests, cross-compiles binaries for 5 platforms (linux/darwin/windows, amd64/arm64), builds Rundeck plugin ZIPs for linux-amd64 and linux-arm64, and creates a GitHub Release with all artifacts attached.
-2. **Docker Push** — builds a multi-arch image (linux/amd64, linux/arm64) and pushes to both Docker Hub (`bluecontainer/kubectl-rundeck-nodes`) and GHCR (`ghcr.io/bluecontainer/kubectl-rundeck-nodes`) with semver tags (`1.2.3`, `1.2`, `1`, `latest`).
-
-**Required repository secrets for Docker Hub:**
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
+2. **Docker Push** — builds a multi-arch image (linux/amd64, linux/arm64) and pushes to GHCR (`ghcr.io/bluecontainer/kubectl-rundeck-nodes`) with semver tags (`1.2.3`, `1.2`, `1`, `latest`).
 
 GHCR authentication uses the built-in `GITHUB_TOKEN` automatically.
 

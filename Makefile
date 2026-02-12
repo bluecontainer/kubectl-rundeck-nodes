@@ -13,7 +13,7 @@ GOTEST := $(GOCMD) test
 GOMOD := $(GOCMD) mod
 GOFMT := $(GOCMD) fmt
 
-.PHONY: all build test clean fmt lint tidy install cross-compile docker-build docker-buildx docker-buildx-local docker-buildx-setup integration-test
+.PHONY: all build test clean fmt lint tidy install cross-compile release release-patch docker-build docker-buildx docker-buildx-local docker-buildx-setup integration-test
 
 all: build
 
@@ -56,8 +56,35 @@ cross-compile: clean
 	GOOS=darwin GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/kubectl-rundeck-nodes
 	GOOS=windows GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/kubectl-rundeck-nodes
 
+# Tag and push to trigger the GitHub Actions release workflow.
+# Usage: make release RELEASE_VERSION=1.2.3
+#        make release-patch  (auto-increment patch: v1.2.3 → v1.2.4)
+release:
+ifndef RELEASE_VERSION
+	$(error Usage: make release RELEASE_VERSION=x.y.z)
+endif
+	@if git rev-parse "v$(RELEASE_VERSION)" >/dev/null 2>&1; then \
+		echo "Error: tag v$(RELEASE_VERSION) already exists"; exit 1; \
+	fi
+	@echo "Tagging v$(RELEASE_VERSION) and pushing to trigger release workflow..."
+	git tag -a "v$(RELEASE_VERSION)" -m "Release v$(RELEASE_VERSION)"
+	git push origin "v$(RELEASE_VERSION)"
+	@echo "Release workflow triggered: https://github.com/$$(git remote get-url origin | sed 's|.*github.com[:/]||;s|\.git$$||')/actions"
+
+release-patch:
+	@LATEST=$$(git tag -l 'v*' --sort=-v:refname | head -1); \
+	if [ -z "$$LATEST" ]; then \
+		echo "No existing tags found. Use: make release RELEASE_VERSION=0.1.0"; exit 1; \
+	fi; \
+	MAJOR=$$(echo "$$LATEST" | sed 's/^v//' | cut -d. -f1); \
+	MINOR=$$(echo "$$LATEST" | sed 's/^v//' | cut -d. -f2); \
+	PATCH=$$(echo "$$LATEST" | sed 's/^v//' | cut -d. -f3); \
+	NEXT="$$MAJOR.$$MINOR.$$((PATCH + 1))"; \
+	echo "Latest tag: $$LATEST → next: v$$NEXT"; \
+	$(MAKE) release RELEASE_VERSION=$$NEXT
+
 # Docker image name
-DOCKER_IMAGE ?= bluecontainer/kubectl-rundeck-nodes
+DOCKER_IMAGE ?= ghcr.io/bluecontainer/kubectl-rundeck-nodes
 DOCKER_TAG ?= $(VERSION)
 PLATFORMS ?= linux/amd64,linux/arm64
 

@@ -67,7 +67,7 @@ providers:
         description: Image containing kubectl-rundeck-nodes (docker/kubernetes mode)
         required: false
         scope: Instance
-        default: bluecontainer/kubectl-rundeck-nodes:latest
+        default: ghcr.io/bluecontainer/kubectl-rundeck-nodes:latest
       - name: docker_network
         type: String
         title: Docker Network
