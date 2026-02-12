@@ -136,7 +136,7 @@ case "$EXECUTION_MODE" in
       --image-pull-policy="$IMAGE_PULL_POLICY" \
       -n "$PLUGIN_NAMESPACE" \
       --overrides='{"spec":{"serviceAccountName":"'"$SERVICE_ACCOUNT"'"}}' \
-      -- kubectl-rundeck-nodes $FLAGS
+      -- $FLAGS
     ;;
 
   *)
